@@ -1,0 +1,315 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto !important; /* Force scrolling to be enabled */
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.particles-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+#tsparticles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+.content-container {
+  z-index: 1;
+  padding: 20px;
+  margin-top: 80px;
+  margin-bottom: 100px; /* Increased bottom margin for footer */
+  flex: 1 0 auto; /* This ensures the container takes up available space but allows footer to be at bottom */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  min-height: 60vh; /* Minimum height to push footer down */
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 40px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  overflow: visible;
+  transition: all 0.3s ease;
+  color: #f2e9e4;
+  height: auto;
+}
+
+.form-field {
+  margin-bottom: 20px !important;
+}
+
+/* Ensure consistent form field styling across browsers */
+.MuiInputBase-root {
+  border-radius: 4px !important;
+}
+
+.MuiOutlinedInput-notchedOutline {
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #4a4e69 !important;
+}
+
+.form-label {
+  color: #f2e9e4 !important;
+  font-weight: 600 !important;
+  margin-bottom: 10px !important;
+  font-size: 1rem !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+  letter-spacing: 0.5px !important;
+  display: flex;
+  flex-direction: column;
+}
+
+.scale-label {
+  font-size: 0.85rem !important;
+  font-weight: 400 !important;
+  opacity: 0.9;
+  margin-top: 2px;
+}
+
+/* Form grid for better mobile layout */
+.form-grid {
+  width: 100%;
+}
+
+/* Mobile scrollable form */
+.mobile-scrollable-form {
+  width: 100%;
+}
+
+.submit-button {
+  margin-top: 20px !important;
+  padding: 12px 36px !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+  border-radius: 8px !important;
+  text-transform: none !important;
+  font-size: 1rem !important;
+}
+
+.submit-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Footer styles - with Chrome-specific fixes */
+footer, .app-footer {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  margin-top: auto !important;
+  flex-shrink: 0 !important;
+  position: relative !important;
+  width: 100% !important;
+  z-index: 100 !important;
+}
+
+/* Chrome-specific fixes */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  footer, .app-footer {
+    position: relative !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .content-container {
+    padding: 10px;
+    margin-top: 60px;
+    margin-bottom: 40px;
+    width: 100%;
+  }
+
+  .glass-panel {
+    padding: 15px;
+    max-height: none;
+    overflow: visible;
+  }
+
+  /* Form field adjustments for mobile */
+  .MuiGrid-item {
+    padding: 8px !important;
+  }
+
+  .form-field {
+    margin-bottom: 12px !important;
+  }
+
+  .form-label {
+    font-size: 0.9rem !important;
+  }
+
+  /* Button adjustments for mobile */
+  .submit-button {
+    padding: 10px 24px !important;
+    font-size: 0.9rem !important;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  body, html {
+    height: auto;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+  }
+
+  #root {
+    height: auto;
+    min-height: 100%;
+    overflow-y: auto;
+  }
+
+  .app {
+    min-height: 100%;
+    height: auto;
+    overflow-y: auto;
+  }
+
+  .content-container {
+    padding: 8px;
+    margin-top: 50px;
+    margin-bottom: 100px; /* Extra space for footer */
+    height: auto;
+    min-height: auto;
+  }
+
+  .glass-panel {
+    padding: 12px;
+    border-radius: 12px;
+    overflow: visible;
+    height: auto;
+    max-height: none;
+  }
+
+  /* Adjust grid for single column on small devices */
+  .MuiGrid-container {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .MuiGrid-item {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex-basis: 100% !important;
+  }
+
+  /* Ensure footer is visible */
+  footer, .app-footer {
+    position: relative !important;
+    bottom: 0 !important;
+    display: block !important;
+    visibility: visible !important;
+    margin-top: 40px !important;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(154, 140, 152, 0.5);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(154, 140, 152, 0.8);
+}
