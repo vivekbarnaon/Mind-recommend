@@ -3,12 +3,16 @@ from flask_cors import CORS
 import os
 
 app = Flask(__name__)
-# Enable CORS for all routes in development, or specific origin in production
-if os.environ.get('FLASK_ENV') == 'production':
-    # Replace with your actual Vercel frontend URL when deployed
-    CORS(app, origins=[os.environ.get('FRONTEND_URL', 'https://mind-recommend.vercel.app')])
-else:
-    CORS(app)
+# Enable CORS for all routes
+CORS(app, resources={r"/*": {"origins": "*"}})
+
+# Add CORS headers to all responses
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    return response
 # Define academic performance options
 academic_options = ['Poor', 'Average', 'Good']
 
@@ -32,8 +36,11 @@ recommendations = {
     'Normal': "Continue healthy habits: regular sleep, balanced diet, exercise, and social engagement. Monitor your well-being and seek help if you notice changes."
 }
 
-@app.route('/api/predict', methods=['POST'])
+@app.route('/api/predict', methods=['POST', 'OPTIONS'])
 def predict():
+    # Handle OPTIONS request for CORS preflight
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
     try:
         data = request.json
 
@@ -92,12 +99,18 @@ def predict():
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
-@app.route('/api/academic-options', methods=['GET'])
+@app.route('/api/academic-options', methods=['GET', 'OPTIONS'])
 def get_academic_options():
+    # Handle OPTIONS request for CORS preflight
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
     return jsonify(academic_options)
 
-@app.route('/')
+@app.route('/', methods=['GET', 'OPTIONS'])
 def home():
+    # Handle OPTIONS request for CORS preflight
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
     return jsonify({
         'message': 'Mental Health Assessment API is running',
         'endpoints': {
