@@ -1,23 +1,28 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
 
 # Get frontend URL from environment variable or use default
 FRONTEND_URL = os.environ.get('FRONTEND_URL', 'https://mind-recommend.vercel.app')
 
-# Enable CORS for specific origins
-CORS(app, resources={r"/*": {"origins": [FRONTEND_URL, "http://localhost:3000"]}}, supports_credentials=True)
+# Enable CORS for all origins in development
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=False)
 
 # Add CORS headers to all responses
 @app.after_request
 def after_request(response):
-    # Allow requests from the frontend URL and localhost for development
-    response.headers.add('Access-Control-Allow-Origin', request.headers.get('Origin', '*'))
+    # Allow requests from any origin
+    response.headers.add('Access-Control-Allow-Origin', '*')
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    # Don't use credentials with wildcard origin
+    # response.headers.add('Access-Control-Allow-Credentials', 'true')
     return response
 # Define academic performance options
 academic_options = ['Poor', 'Average', 'Good']

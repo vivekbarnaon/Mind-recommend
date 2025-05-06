@@ -15,7 +15,7 @@ import {
 import axios from 'axios';
 
 // API URL for backend connection
-const API_URL = 'https://mind-recommend-3.onrender.com';
+const API_URL = 'https://mind-recommend-1.onrender.com';
 
 // Backup API URL in case the primary one fails
 const BACKUP_API_URL = 'https://mind-recommend-api.onrender.com';
@@ -132,6 +132,16 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
     } catch (error) {
       console.error('Error submitting form:', error);
 
+      // Log detailed error information for debugging
+      console.log('Error details:', {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        config: error.config,
+        code: error.code
+      });
+
       if (error.message === 'Network Error') {
         setError('Network error. Please check your internet connection and try again.');
       } else if (error.response && error.response.status === 400) {
@@ -144,6 +154,10 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
         }
       } else if (error.code === 'ECONNABORTED') {
         setError('Request timed out. The server might be overloaded, please try again later.');
+      } else if (error.response && error.response.status === 0) {
+        setError('CORS error: The server is not allowing cross-origin requests. Please check your backend configuration.');
+      } else if (error.response && error.response.status === 500) {
+        setError('Server error: The backend server encountered an internal error. Please try again later.');
       } else {
         setError(`An error occurred: ${error.message}. Please try again later.`);
       }

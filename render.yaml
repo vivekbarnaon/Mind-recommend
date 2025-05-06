@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: mind-recommend-api
+    name: mind-recommend-1
     env: python
     region: singapore  # Choose a region close to your users
     plan: free  # Use the free plan
