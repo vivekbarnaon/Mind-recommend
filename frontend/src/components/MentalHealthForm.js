@@ -12,13 +12,8 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 
-// Use environment variable for API URL with fallback to production URL
-const API_URL = process.env.REACT_APP_API_URL || 'https://mind-recommend-3.onrender.com';
-
-// Function to check if we're running on a mobile device
-const isMobileDevice = () => {
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-};
+// Hardcoded API URL to ensure it works on all devices
+const API_URL = 'https://mind-recommend-3.onrender.com';
 
 
 const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
@@ -119,37 +114,18 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
 
       console.log('Sending data to API:', formattedData);
       console.log('API URL:', API_URL);
-      console.log('Is mobile device:', isMobileDevice());
 
-      // Special handling for mobile devices
-      const isMobile = isMobileDevice();
-
-      // Add timeout and headers for better mobile compatibility
-      const axiosConfig = {
-        timeout: isMobile ? 60000 : 30000, // Longer timeout for mobile
+      // Simple direct API call with longer timeout
+      const response = await axios({
+        method: 'post',
+        url: `${API_URL}/api/predict`,
+        data: formattedData,
+        timeout: 60000, // 60 seconds timeout
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         }
-      };
-
-      // Try with HTTPS first
-      let response;
-      try {
-        response = await axios.post(`${API_URL}/api/predict`, formattedData, axiosConfig);
-      } catch (httpsError) {
-        console.error('HTTPS request failed:', httpsError);
-
-        if (isMobile) {
-          // If HTTPS fails on mobile, try with HTTP as fallback
-          console.log('Trying HTTP fallback for mobile...');
-          const httpUrl = API_URL.replace('https://', 'http://');
-          response = await axios.post(`${httpUrl}/api/predict`, formattedData, axiosConfig);
-        } else {
-          // Re-throw the error if not on mobile
-          throw httpsError;
-        }
-      }
+      });
 
       // Pass the original form data to the parent component
       setParentFormData(formData);
@@ -157,44 +133,16 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
     } catch (error) {
       console.error('Error submitting form:', error);
 
-      // Check if we're on a mobile device
-      const isMobile = isMobileDevice();
+      // Simple error message for all cases
+      setError('Connection error. Please check your internet connection and try again.');
 
-      // More detailed error handling with mobile-specific messages
-      if (error.message === 'Network Error') {
-        if (isMobile) {
-          setError('Network error on mobile. Try switching to WiFi or check your mobile data connection.');
-        } else {
-          setError('Network error. Please check your internet connection and try again.');
-        }
-      } else if (error.message && error.message.includes('timeout')) {
-        if (isMobile) {
-          setError('Request timed out on mobile. Try again with a stronger connection or WiFi.');
-        } else {
-          setError('Request timed out. The server is taking too long to respond. Please try again later.');
-        }
-      } else if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        if (error.response.status === 400) {
-          setError('Invalid data format. Please check your inputs and try again.');
-        } else if (error.response.status === 500) {
-          setError('Server error. Our team has been notified and is working on it.');
-        } else if (error.response.status === 429) {
-          setError('Too many requests. Please wait a moment and try again.');
-        } else {
-          setError(error.response.data?.error || `Error (${error.response.status}): Please try again.`);
-        }
+      // Log detailed error for debugging
+      if (error.response) {
+        console.log('Error response:', error.response.status, error.response.data);
       } else if (error.request) {
-        // The request was made but no response was received
-        if (isMobile) {
-          setError('No response from server on mobile. Try switching networks or try again later.');
-        } else {
-          setError('No response from server. Please try again later.');
-        }
+        console.log('Error request:', error.request);
       } else {
-        // Something happened in setting up the request that triggered an Error
-        setError('An unexpected error occurred. Please try again.');
+        console.log('Error message:', error.message);
       }
     } finally {
       setLoading(false);
