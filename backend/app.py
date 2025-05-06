@@ -1,9 +1,14 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import os
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
-
+# Enable CORS for all routes in development, or specific origin in production
+if os.environ.get('FLASK_ENV') == 'production':
+    # Replace with your actual Vercel frontend URL when deployed
+    CORS(app, origins=[os.environ.get('FRONTEND_URL', 'https://mind-recommend.vercel.app')])
+else:
+    CORS(app)
 # Define academic performance options
 academic_options = ['Poor', 'Average', 'Good']
 
@@ -91,5 +96,16 @@ def predict():
 def get_academic_options():
     return jsonify(academic_options)
 
+@app.route('/')
+def home():
+    return jsonify({
+        'message': 'Mental Health Assessment API is running',
+        'endpoints': {
+            'predict': '/api/predict',
+            'academic_options': '/api/academic-options'
+        }
+    })
+
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=os.environ.get('FLASK_ENV') != 'production')

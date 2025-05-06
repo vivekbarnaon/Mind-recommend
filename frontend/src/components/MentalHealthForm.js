@@ -12,7 +12,8 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000';
+// Use environment variable for API URL with fallback to localhost for development
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
   const [formData, setFormData] = useState({
