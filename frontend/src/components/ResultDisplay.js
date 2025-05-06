@@ -121,10 +121,22 @@ const ResultDisplay = ({ result, formData, onReset }) => {
               elevation={3}
               sx={{
                 height: '100%',
-                background: theme.palette.mode === 'light'
-                  ? 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(240,240,245,0.9) 100%)'
-                  : 'linear-gradient(135deg, rgba(40,40,50,0.9) 0%, rgba(30,30,35,0.9) 100%)',
-                backdropFilter: 'blur(10px)'
+                background: 'linear-gradient(135deg, rgba(100, 255, 218, 0.1) 0%, rgba(74, 78, 105, 0.2) 100%)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(100, 255, 218, 0.2)',
+                boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.2), inset 0 0 80px rgba(100, 255, 218, 0.05)',
+                position: 'relative',
+                overflow: 'hidden',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '4px',
+                  background: 'linear-gradient(90deg, rgba(100, 255, 218, 0.8), rgba(74, 78, 105, 0.8))',
+                  zIndex: 1
+                }
               }}
             >
               <CardContent>
@@ -148,6 +160,8 @@ const ResultDisplay = ({ result, formData, onReset }) => {
                       alignItems: 'center',
                       justifyContent: 'center',
                       position: 'relative',
+                      background: `linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(${conditionInfo.color.replace('rgb(', '').replace(')', '')}, 0.05) 100%)`,
+                      boxShadow: `0 0 30px rgba(${conditionInfo.color.replace('rgb(', '').replace(')', '')}, 0.2)`,
                       '&::before': {
                         content: '""',
                         position: 'absolute',
@@ -156,7 +170,22 @@ const ResultDisplay = ({ result, formData, onReset }) => {
                         right: -8,
                         bottom: -8,
                         borderRadius: '50%',
-                        border: `2px solid ${theme.palette.background.paper}`,
+                        border: `2px solid rgba(255, 255, 255, 0.2)`,
+                        animation: 'pulse 2s infinite'
+                      },
+                      '@keyframes pulse': {
+                        '0%': {
+                          transform: 'scale(1)',
+                          opacity: 0.8
+                        },
+                        '50%': {
+                          transform: 'scale(1.05)',
+                          opacity: 0.5
+                        },
+                        '100%': {
+                          transform: 'scale(1)',
+                          opacity: 0.8
+                        }
                       }
                     }}
                   >
@@ -216,10 +245,22 @@ const ResultDisplay = ({ result, formData, onReset }) => {
               elevation={3}
               sx={{
                 height: '100%',
-                background: theme.palette.mode === 'light'
-                  ? 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(240,240,245,0.9) 100%)'
-                  : 'linear-gradient(135deg, rgba(40,40,50,0.9) 0%, rgba(30,30,35,0.9) 100%)',
-                backdropFilter: 'blur(10px)'
+                background: 'linear-gradient(135deg, rgba(100, 255, 218, 0.1) 0%, rgba(74, 78, 105, 0.2) 100%)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(100, 255, 218, 0.2)',
+                boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.2), inset 0 0 80px rgba(100, 255, 218, 0.05)',
+                position: 'relative',
+                overflow: 'hidden',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '4px',
+                  background: 'linear-gradient(90deg, rgba(100, 255, 218, 0.8), rgba(74, 78, 105, 0.8))',
+                  zIndex: 1
+                }
               }}
             >
               <CardContent>
@@ -272,10 +313,22 @@ const ResultDisplay = ({ result, formData, onReset }) => {
             <Card
               elevation={3}
               sx={{
-                background: theme.palette.mode === 'light'
-                  ? 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(240,240,245,0.9) 100%)'
-                  : 'linear-gradient(135deg, rgba(40,40,50,0.9) 0%, rgba(30,30,35,0.9) 100%)',
-                backdropFilter: 'blur(10px)'
+                background: 'linear-gradient(135deg, rgba(100, 255, 218, 0.1) 0%, rgba(74, 78, 105, 0.2) 100%)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(100, 255, 218, 0.2)',
+                boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.2), inset 0 0 80px rgba(100, 255, 218, 0.05)',
+                position: 'relative',
+                overflow: 'hidden',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '4px',
+                  background: 'linear-gradient(90deg, rgba(100, 255, 218, 0.8), rgba(74, 78, 105, 0.8))',
+                  zIndex: 1
+                }
               }}
             >
               <CardContent>
@@ -294,9 +347,16 @@ const ResultDisplay = ({ result, formData, onReset }) => {
                       elevation={0}
                       sx={{
                         p: 2,
-                        bgcolor: theme.palette.mode === 'light' ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.03)',
+                        background: 'linear-gradient(135deg, rgba(100, 255, 218, 0.05) 0%, rgba(74, 78, 105, 0.1) 100%)',
                         borderRadius: 2,
-                        height: '100%'
+                        height: '100%',
+                        border: '1px solid rgba(100, 255, 218, 0.1)',
+                        boxShadow: 'inset 0 0 20px rgba(100, 255, 218, 0.03)',
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                          boxShadow: 'inset 0 0 30px rgba(100, 255, 218, 0.05), 0 5px 15px rgba(0, 0, 0, 0.1)',
+                          transform: 'translateY(-2px)'
+                        }
                       }}
                     >
                       <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -320,9 +380,16 @@ const ResultDisplay = ({ result, formData, onReset }) => {
                       elevation={0}
                       sx={{
                         p: 2,
-                        bgcolor: theme.palette.mode === 'light' ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.03)',
+                        background: 'linear-gradient(135deg, rgba(100, 255, 218, 0.05) 0%, rgba(74, 78, 105, 0.1) 100%)',
                         borderRadius: 2,
-                        height: '100%'
+                        height: '100%',
+                        border: '1px solid rgba(100, 255, 218, 0.1)',
+                        boxShadow: 'inset 0 0 20px rgba(100, 255, 218, 0.03)',
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                          boxShadow: 'inset 0 0 30px rgba(100, 255, 218, 0.05), 0 5px 15px rgba(0, 0, 0, 0.1)',
+                          transform: 'translateY(-2px)'
+                        }
                       }}
                     >
                       <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -346,9 +413,16 @@ const ResultDisplay = ({ result, formData, onReset }) => {
                       elevation={0}
                       sx={{
                         p: 2,
-                        bgcolor: theme.palette.mode === 'light' ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.03)',
+                        background: 'linear-gradient(135deg, rgba(100, 255, 218, 0.05) 0%, rgba(74, 78, 105, 0.1) 100%)',
                         borderRadius: 2,
-                        height: '100%'
+                        height: '100%',
+                        border: '1px solid rgba(100, 255, 218, 0.1)',
+                        boxShadow: 'inset 0 0 20px rgba(100, 255, 218, 0.03)',
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                          boxShadow: 'inset 0 0 30px rgba(100, 255, 218, 0.05), 0 5px 15px rgba(0, 0, 0, 0.1)',
+                          transform: 'translateY(-2px)'
+                        }
                       }}
                     >
                       <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -370,9 +444,16 @@ const ResultDisplay = ({ result, formData, onReset }) => {
                       elevation={0}
                       sx={{
                         p: 2,
-                        bgcolor: theme.palette.mode === 'light' ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.03)',
+                        background: 'linear-gradient(135deg, rgba(100, 255, 218, 0.05) 0%, rgba(74, 78, 105, 0.1) 100%)',
                         borderRadius: 2,
-                        height: '100%'
+                        height: '100%',
+                        border: '1px solid rgba(100, 255, 218, 0.1)',
+                        boxShadow: 'inset 0 0 20px rgba(100, 255, 218, 0.03)',
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                          boxShadow: 'inset 0 0 30px rgba(100, 255, 218, 0.05), 0 5px 15px rgba(0, 0, 0, 0.1)',
+                          transform: 'translateY(-2px)'
+                        }
                       }}
                     >
                       <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -412,7 +493,36 @@ const ResultDisplay = ({ result, formData, onReset }) => {
               px: { xs: 2, sm: 4 },
               py: { xs: 1, sm: 1.5 },
               fontSize: { xs: '0.875rem', sm: '1rem' },
-              borderRadius: '8px'
+              borderRadius: '8px',
+              background: 'linear-gradient(135deg, rgba(100, 255, 218, 0.8) 0%, rgba(74, 78, 105, 0.9) 100%)',
+              border: 'none',
+              position: 'relative',
+              overflow: 'hidden',
+              color: '#0a192f',
+              letterSpacing: '0.5px',
+              transition: 'all 0.3s ease',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: '-100%',
+                width: '100%',
+                height: '100%',
+                background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent)',
+                transition: '0.5s'
+              },
+              '&:hover': {
+                transform: 'translateY(-3px)',
+                boxShadow: '0 7px 20px rgba(0, 0, 0, 0.3), 0 0 15px rgba(100, 255, 218, 0.5)',
+                background: 'linear-gradient(135deg, rgba(100, 255, 218, 0.9) 0%, rgba(74, 78, 105, 1) 100%)'
+              },
+              '&:hover::before': {
+                left: '100%'
+              },
+              '&:active': {
+                transform: 'translateY(0)',
+                boxShadow: '0 3px 10px rgba(0, 0, 0, 0.2)'
+              }
             }}
           >
             Take Another Assessment
