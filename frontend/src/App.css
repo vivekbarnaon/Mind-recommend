@@ -275,6 +275,17 @@ footer, .app-footer {
   z-index: 100 !important;
 }
 
+/* Footer container styles */
+.desktop-footer-container {
+  display: block;
+  width: 100%;
+}
+
+.mobile-footer-container {
+  display: none;
+  width: 100%;
+}
+
 /* Chrome-specific fixes */
 @media screen and (-webkit-min-device-pixel-ratio:0) {
   footer, .app-footer {
@@ -414,6 +425,15 @@ footer, .app-footer {
     width: 100% !important;
     max-width: 100% !important;
     flex-basis: 100% !important;
+  }
+
+  /* Footer visibility control for mobile */
+  .desktop-footer-container {
+    display: none !important;
+  }
+
+  .mobile-footer-container {
+    display: block !important;
   }
 
   /* Ensure footer is visible */

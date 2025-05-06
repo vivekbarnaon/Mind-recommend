@@ -184,11 +184,20 @@ function App() {
           </Container>
         )}
 
-        {/* Regular Footer (hidden on mobile) - Only show when welcome page is not visible */}
-        {!showWelcome && <Footer />}
+        {/* Footer - Conditionally render based on screen size */}
+        {!showWelcome && (
+          <>
+            {/* Regular Footer (hidden on mobile via CSS) */}
+            <div className="desktop-footer-container">
+              <Footer />
+            </div>
 
-        {/* Mobile Footer (only visible on mobile) - Only show when welcome page is not visible */}
-        {!showWelcome && <MobileFooter />}
+            {/* Mobile Footer (only visible on mobile via CSS) */}
+            <div className="mobile-footer-container">
+              <MobileFooter />
+            </div>
+          </>
+        )}
       </div>
     </ThemeProvider>
   );
