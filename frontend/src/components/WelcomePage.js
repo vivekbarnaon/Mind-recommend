@@ -241,10 +241,10 @@ const WelcomePage = ({ onGetStarted }) => {
                   fontSize: { xs: '0.9rem', sm: '1rem' }
                 }}
               >
-                Our research utilized the CIFAKE dataset, a comprehensive collection of real and AI-generated images specifically designed
-                for training and testing detection algorithms. The dataset consists of 60,000 images (30,000 real and 30,000 AI-generated)
-                with a resolution of 32x32 pixels. The real images are sourced from the CIFAR-10 dataset, while the AI-generated images are
-                created using Stable Diffusion v1.5, providing a balanced and diverse set of samples for training and evaluation.
+                Our research utilized a comprehensive student mental health dataset collected from various educational institutions.
+                The dataset includes information about students' daily habits, academic performance, social interactions, and mental
+                wellbeing indicators. We carefully curated and preprocessed this data to train our machine learning models for
+                accurate mental health recommendations.
               </Typography>
 
               <Grid container spacing={2} sx={{ mt: 1 }} className="welcome-stats-grid">
@@ -258,10 +258,10 @@ const WelcomePage = ({ onGetStarted }) => {
                     border: '1px solid rgba(100, 255, 218, 0.2)',
                   }}>
                     <Typography variant="subtitle2" sx={{ color: 'rgba(100, 255, 218, 0.9)', mb: 0.5 }}>
-                      Total Images
+                      Total Records
                     </Typography>
                     <Typography variant="h6" sx={{ color: 'white' }}>
-                      60,000
+                      1,200+
                     </Typography>
                   </Box>
                 </Grid>
@@ -275,10 +275,10 @@ const WelcomePage = ({ onGetStarted }) => {
                     border: '1px solid rgba(100, 255, 218, 0.2)',
                   }}>
                     <Typography variant="subtitle2" sx={{ color: 'rgba(100, 255, 218, 0.9)', mb: 0.5 }}>
-                      Real Images
+                      Features
                     </Typography>
                     <Typography variant="h6" sx={{ color: 'white' }}>
-                      30,000
+                      10+
                     </Typography>
                   </Box>
                 </Grid>
@@ -292,10 +292,10 @@ const WelcomePage = ({ onGetStarted }) => {
                     border: '1px solid rgba(100, 255, 218, 0.2)',
                   }}>
                     <Typography variant="subtitle2" sx={{ color: 'rgba(100, 255, 218, 0.9)', mb: 0.5 }}>
-                      AI-Generated
+                      Accuracy
                     </Typography>
                     <Typography variant="h6" sx={{ color: 'white' }}>
-                      30,000
+                      85%+
                     </Typography>
                   </Box>
                 </Grid>
@@ -357,9 +357,9 @@ const WelcomePage = ({ onGetStarted }) => {
                   fontSize: { xs: '0.9rem', sm: '1rem' }
                 }}
               >
-                We employed transfer learning techniques using four pre-trained convolutional neural network architectures: ResNet50,
-                VGG16, EfficientNetV2-B0, and MobileNetV3Small. Each model was fine-tuned on our dataset with the following
-                modifications:
+                Our mental health recommendation system uses a sophisticated machine learning pipeline with multiple models to analyze student data
+                and provide personalized recommendations. We implemented and compared several algorithms to find the optimal approach for mental
+                health prediction.
               </Typography>
 
               <Box sx={{ pl: 2 }}>
@@ -387,7 +387,7 @@ const WelcomePage = ({ onGetStarted }) => {
                       boxShadow: '0 0 5px rgba(100, 255, 218, 0.5)'
                     }}
                   />
-                  Addition of batch normalization layers to improve training stability
+                  Random Forest Classifier for robust prediction with feature importance analysis
                 </Typography>
 
                 <Typography
@@ -414,7 +414,34 @@ const WelcomePage = ({ onGetStarted }) => {
                       boxShadow: '0 0 5px rgba(100, 255, 218, 0.5)'
                     }}
                   />
-                  Implementation of dropout (rate = 0.5) to prevent overfitting
+                  Gradient Boosting for improved accuracy and handling of complex relationships
+                </Typography>
+
+                <Typography
+                  variant="body1"
+                  component="div"
+                  sx={{
+                    color: 'rgba(255, 255, 255, 0.9)',
+                    mb: 1,
+                    lineHeight: 1.6,
+                    fontSize: { xs: '0.9rem', sm: '1rem' },
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Box
+                    component="span"
+                    sx={{
+                      display: 'inline-block',
+                      width: '6px',
+                      height: '6px',
+                      borderRadius: '50%',
+                      bgcolor: 'rgba(100, 255, 218, 0.9)',
+                      mr: 1.5,
+                      boxShadow: '0 0 5px rgba(100, 255, 218, 0.5)'
+                    }}
+                  />
+                  Neural Network models with optimized hyperparameters for deep pattern recognition
                 </Typography>
 
                 <Typography
@@ -440,7 +467,7 @@ const WelcomePage = ({ onGetStarted }) => {
                       boxShadow: '0 0 5px rgba(100, 255, 218, 0.5)'
                     }}
                   />
-                  Custom learning rate scheduler with warm-up and decay phases
+                  Ensemble methods combining multiple models for more reliable recommendations
                 </Typography>
               </Box>
             </Box>
