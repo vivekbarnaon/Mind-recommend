@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Typography, Link, Container, Divider, useTheme } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import GitHubIcon from '@mui/icons-material/GitHub';
 import './Footer.css'; // Import custom CSS for footer
 
 const Footer = () => {
@@ -55,7 +56,31 @@ const Footer = () => {
           </Typography>
         </Box>
 
-        <Typography variant="body2" color="#c9ada7" align="center" sx={{ mt: 1 }}>
+        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <Link
+            href="https://github.com/vivekbarnaon/Mind-recommend"
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              color: 'rgba(255, 255, 255, 0.7)',
+              textDecoration: 'none',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                color: 'rgba(100, 255, 218, 0.9)',
+                transform: 'translateY(-2px)'
+              }
+            }}
+          >
+            <GitHubIcon sx={{ mr: 1, fontSize: 20 }} />
+            <Typography variant="body2">
+              View on GitHub
+            </Typography>
+          </Link>
+        </Box>
+
+        <Typography variant="body2" color="#c9ada7" align="center" sx={{ mt: 2 }}>
           © {new Date().getFullYear()} Mental Health Assessment
         </Typography>
       </Container>
