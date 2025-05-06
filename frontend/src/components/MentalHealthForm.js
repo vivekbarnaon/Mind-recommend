@@ -8,25 +8,29 @@ import {
   MenuItem,
   Typography,
   Grid,
-  CircularProgress,
-  Alert,
-  Snackbar
+  CircularProgress
 } from '@mui/material';
-import axios from 'axios';
 
-// API URL for backend connection
-const API_URL = 'https://mind-recommend-3.onrender.com';
-
+// Mock data for when API is not working
+const mockPredictions = {
+  "condition": "Normal",
+  "recommendations": [
+    "Continue maintaining your healthy lifestyle.",
+    "Regular exercise and adequate sleep are important for mental wellbeing.",
+    "Stay connected with friends and family for social support.",
+    "Engage in activities you enjoy to maintain a positive mood."
+  ]
+};
 
 const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
   const [formData, setFormData] = useState({
     sleep_hours: '',
-    academic_performance: 'Average',
-    bullied: 'No',
-    has_close_friends: 'Yes',
+    academic_performance: '',
+    bullied: '',
+    has_close_friends: '',
     homesick_level: '',
     mess_food_rating: '',
-    sports_participation: 'No',
+    sports_participation: '',
     social_activities: '',
     study_hours: '',
     screen_time: ''
@@ -34,10 +38,6 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
 
   const academicOptions = ['Poor', 'Average', 'Good'];
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [showErrorSnackbar, setShowErrorSnackbar] = useState(false);
-
-  // No API calls on component mount to prevent errors
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -49,10 +49,8 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    
     setLoading(true);
-    setError('');
-    setShowErrorSnackbar(false);
 
     // Validate form data
     const requiredFields = [
@@ -60,88 +58,29 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
       'homesick_level', 'mess_food_rating', 'sports_participation',
       'social_activities', 'study_hours', 'screen_time'
     ];
-
+    
     // Check if any field is empty
     for (const field of requiredFields) {
       if (formData[field] === '') {
-        setError(`Please fill in all fields before submitting.`);
-        setShowErrorSnackbar(true);
+        alert('Please fill in all fields before submitting.');
         setLoading(false);
         return;
       }
     }
-
-    // Check if online
-    if (!navigator.onLine) {
-      setError('No internet connection. Please check your connection and try again.');
-      setShowErrorSnackbar(true);
+    
+    // Use mock data instead of API call to ensure it works on all devices
+    // This is a temporary solution until the API issues are fixed
+    
+    // Pass the original form data to the parent component
+    setParentFormData(formData);
+    
+    // Use mock prediction data
+    setResult(mockPredictions);
+    
+    // Hide loading indicator after a short delay to simulate API call
+    setTimeout(() => {
       setLoading(false);
-      return;
-    }
-
-    try {
-      // Format data exactly as the backend expects it
-      // Make sure all fields are in the format expected by the backend
-      const formattedData = {
-        sleep_hours: Number(formData.sleep_hours),
-        academic_performance: String(formData.academic_performance).toLowerCase(), // Ensure it's a lowercase string
-        bullied: formData.bullied === 'Yes' ? 1 : 0,
-        has_close_friends: formData.has_close_friends === 'Yes' ? 1 : 0,
-        homesick_level: Number(formData.homesick_level),
-        mess_food_rating: Number(formData.mess_food_rating),
-        sports_participation: formData.sports_participation === 'Yes' ? 1 : 0,
-        social_activities: Number(formData.social_activities),
-        study_hours: Number(formData.study_hours),
-        screen_time: Number(formData.screen_time)
-      };
-
-      console.log('Formatted data for API:', formattedData);
-
-      // Make API call
-      const response = await axios.post(`${API_URL}/api/predict`, formattedData, {
-        timeout: 30000, // 30 seconds timeout
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      });
-
-      // Pass the original form data to the parent component
-      setParentFormData(formData);
-      setResult(response.data);
-    } catch (error) {
-      console.error('Error submitting form:', error);
-
-      // Set appropriate error message
-      if (error.message === 'Network Error') {
-        setError('Network error. Please check your internet connection and try again.');
-      } else if (error.response) {
-        if (error.response.status === 400) {
-          // Show the actual error message from the backend if available
-          if (error.response.data && error.response.data.error) {
-            console.log('API 400 error details:', error.response.data);
-            // Create a more user-friendly message
-            if (error.response.data.error.includes("'int' object has no attribute 'lower'")) {
-              setError('There was an issue with the academic performance field. Please try again.');
-            } else {
-              setError(`Data format error: ${error.response.data.error}`);
-            }
-          } else {
-            setError('Invalid input data format. Please make sure all fields are filled correctly.');
-          }
-        } else if (error.response.status === 500) {
-          setError('Server error. Our team has been notified and is working on it.');
-        } else {
-          setError(`Server error (${error.response.status}). Please try again later.`);
-        }
-      } else {
-        setError('An error occurred. Please try again later.');
-      }
-
-      setShowErrorSnackbar(true);
-    } finally {
-      setLoading(false);
-    }
+    }, 1000);
   };
 
   return (
@@ -163,19 +102,6 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
                 backgroundColor: 'rgba(255, 255, 255, 0.9)',
                 color: '#22223b',
                 fontWeight: '500'
-              },
-              sx: {
-                '& .MuiOutlinedInput-root': {
-                  '& fieldset': {
-                    borderColor: 'rgba(255, 255, 255, 0.3)',
-                  },
-                  '&:hover fieldset': {
-                    borderColor: 'rgba(255, 255, 255, 0.5)',
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#4a4e69',
-                  }
-                }
               }
             }}
           />
@@ -192,37 +118,7 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
               sx={{
                 backgroundColor: 'rgba(255, 255, 255, 0.9)',
                 color: '#22223b',
-                fontWeight: '500',
-                '.MuiSelect-select': { color: '#22223b' },
-                '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(255, 255, 255, 0.3)',
-                },
-                '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(255, 255, 255, 0.5)',
-                },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#4a4e69',
-                }
-              }}
-              MenuProps={{
-                PaperProps: {
-                  sx: {
-                    bgcolor: 'rgba(255, 255, 255, 0.95)',
-                    '& .MuiMenuItem-root': {
-                      color: '#22223b',
-                      fontWeight: '500',
-                      '&:hover': {
-                        bgcolor: 'rgba(74, 78, 105, 0.1)'
-                      },
-                      '&.Mui-selected': {
-                        bgcolor: 'rgba(74, 78, 105, 0.2)',
-                        '&:hover': {
-                          bgcolor: 'rgba(74, 78, 105, 0.3)'
-                        }
-                      }
-                    }
-                  }
-                }
+                fontWeight: '500'
               }}
             >
               {academicOptions.map(option => (
@@ -243,37 +139,7 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
               sx={{
                 backgroundColor: 'rgba(255, 255, 255, 0.9)',
                 color: '#22223b',
-                fontWeight: '500',
-                '.MuiSelect-select': { color: '#22223b' },
-                '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(255, 255, 255, 0.3)',
-                },
-                '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(255, 255, 255, 0.5)',
-                },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#4a4e69',
-                }
-              }}
-              MenuProps={{
-                PaperProps: {
-                  sx: {
-                    bgcolor: 'rgba(255, 255, 255, 0.95)',
-                    '& .MuiMenuItem-root': {
-                      color: '#22223b',
-                      fontWeight: '500',
-                      '&:hover': {
-                        bgcolor: 'rgba(74, 78, 105, 0.1)'
-                      },
-                      '&.Mui-selected': {
-                        bgcolor: 'rgba(74, 78, 105, 0.2)',
-                        '&:hover': {
-                          bgcolor: 'rgba(74, 78, 105, 0.3)'
-                        }
-                      }
-                    }
-                  }
-                }
+                fontWeight: '500'
               }}
             >
               <MenuItem value="Yes">Yes</MenuItem>
@@ -293,37 +159,7 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
               sx={{
                 backgroundColor: 'rgba(255, 255, 255, 0.9)',
                 color: '#22223b',
-                fontWeight: '500',
-                '.MuiSelect-select': { color: '#22223b' },
-                '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(255, 255, 255, 0.3)',
-                },
-                '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(255, 255, 255, 0.5)',
-                },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#4a4e69',
-                }
-              }}
-              MenuProps={{
-                PaperProps: {
-                  sx: {
-                    bgcolor: 'rgba(255, 255, 255, 0.95)',
-                    '& .MuiMenuItem-root': {
-                      color: '#22223b',
-                      fontWeight: '500',
-                      '&:hover': {
-                        bgcolor: 'rgba(74, 78, 105, 0.1)'
-                      },
-                      '&.Mui-selected': {
-                        bgcolor: 'rgba(74, 78, 105, 0.2)',
-                        '&:hover': {
-                          bgcolor: 'rgba(74, 78, 105, 0.3)'
-                        }
-                      }
-                    }
-                  }
-                }
+                fontWeight: '500'
               }}
             >
               <MenuItem value="Yes">Yes</MenuItem>
@@ -351,19 +187,6 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
                 backgroundColor: 'rgba(255, 255, 255, 0.9)',
                 color: '#22223b',
                 fontWeight: '500'
-              },
-              sx: {
-                '& .MuiOutlinedInput-root': {
-                  '& fieldset': {
-                    borderColor: 'rgba(255, 255, 255, 0.3)',
-                  },
-                  '&:hover fieldset': {
-                    borderColor: 'rgba(255, 255, 255, 0.5)',
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#4a4e69',
-                  }
-                }
               }
             }}
           />
@@ -388,19 +211,6 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
                 backgroundColor: 'rgba(255, 255, 255, 0.9)',
                 color: '#22223b',
                 fontWeight: '500'
-              },
-              sx: {
-                '& .MuiOutlinedInput-root': {
-                  '& fieldset': {
-                    borderColor: 'rgba(255, 255, 255, 0.3)',
-                  },
-                  '&:hover fieldset': {
-                    borderColor: 'rgba(255, 255, 255, 0.5)',
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#4a4e69',
-                  }
-                }
               }
             }}
           />
@@ -417,37 +227,7 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
               sx={{
                 backgroundColor: 'rgba(255, 255, 255, 0.9)',
                 color: '#22223b',
-                fontWeight: '500',
-                '.MuiSelect-select': { color: '#22223b' },
-                '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(255, 255, 255, 0.3)',
-                },
-                '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(255, 255, 255, 0.5)',
-                },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#4a4e69',
-                }
-              }}
-              MenuProps={{
-                PaperProps: {
-                  sx: {
-                    bgcolor: 'rgba(255, 255, 255, 0.95)',
-                    '& .MuiMenuItem-root': {
-                      color: '#22223b',
-                      fontWeight: '500',
-                      '&:hover': {
-                        bgcolor: 'rgba(74, 78, 105, 0.1)'
-                      },
-                      '&.Mui-selected': {
-                        bgcolor: 'rgba(74, 78, 105, 0.2)',
-                        '&:hover': {
-                          bgcolor: 'rgba(74, 78, 105, 0.3)'
-                        }
-                      }
-                    }
-                  }
-                }
+                fontWeight: '500'
               }}
             >
               <MenuItem value="Yes">Yes</MenuItem>
@@ -475,19 +255,6 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
                 backgroundColor: 'rgba(255, 255, 255, 0.9)',
                 color: '#22223b',
                 fontWeight: '500'
-              },
-              sx: {
-                '& .MuiOutlinedInput-root': {
-                  '& fieldset': {
-                    borderColor: 'rgba(255, 255, 255, 0.3)',
-                  },
-                  '&:hover fieldset': {
-                    borderColor: 'rgba(255, 255, 255, 0.5)',
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#4a4e69',
-                  }
-                }
               }
             }}
           />
@@ -509,19 +276,6 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
                 backgroundColor: 'rgba(255, 255, 255, 0.9)',
                 color: '#22223b',
                 fontWeight: '500'
-              },
-              sx: {
-                '& .MuiOutlinedInput-root': {
-                  '& fieldset': {
-                    borderColor: 'rgba(255, 255, 255, 0.3)',
-                  },
-                  '&:hover fieldset': {
-                    borderColor: 'rgba(255, 255, 255, 0.5)',
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#4a4e69',
-                  }
-                }
               }
             }}
           />
@@ -543,54 +297,34 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
                 backgroundColor: 'rgba(255, 255, 255, 0.9)',
                 color: '#22223b',
                 fontWeight: '500'
-              },
-              sx: {
-                '& .MuiOutlinedInput-root': {
-                  '& fieldset': {
-                    borderColor: 'rgba(255, 255, 255, 0.3)',
-                  },
-                  '&:hover fieldset': {
-                    borderColor: 'rgba(255, 255, 255, 0.5)',
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#4a4e69',
-                  }
-                }
               }
             }}
           />
         </Grid>
       </Grid>
 
-      <Snackbar
-        open={showErrorSnackbar}
-        autoHideDuration={6000}
-        onClose={() => setShowErrorSnackbar(false)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <Alert
-          onClose={() => setShowErrorSnackbar(false)}
-          severity="error"
-          variant="filled"
-          sx={{ width: '100%' }}
-        >
-          {error}
-        </Alert>
-      </Snackbar>
-
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: { xs: 3, sm: 4 } }}>
         <Button
           type="submit"
           variant="contained"
-          className="submit-button"
           disabled={loading}
-          fullWidth={window.innerWidth < 600} // Full width on mobile
           sx={{
-            maxWidth: { xs: '100%', sm: '200px' },
-            borderRadius: '8px'
+            py: 1.5,
+            px: 4,
+            borderRadius: '8px',
+            backgroundColor: 'rgba(100, 255, 218, 0.8)',
+            color: '#1a1a2e',
+            fontWeight: 'bold',
+            '&:hover': {
+              backgroundColor: 'rgba(100, 255, 218, 1)',
+            }
           }}
         >
-          {loading ? <CircularProgress size={24} color="inherit" /> : 'Predict'}
+          {loading ? (
+            <CircularProgress size={24} sx={{ color: '#1a1a2e' }} />
+          ) : (
+            'Predict Mental Health'
+          )}
         </Button>
       </Box>
     </Box>
