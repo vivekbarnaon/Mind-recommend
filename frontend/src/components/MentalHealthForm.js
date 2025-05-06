@@ -8,19 +8,14 @@ import {
   MenuItem,
   Typography,
   Grid,
-  CircularProgress
+  CircularProgress,
+  Snackbar,
+  Alert
 } from '@mui/material';
+import axios from 'axios';
 
-// Mock data for when API is not working
-const mockPredictions = {
-  "condition": "Normal",
-  "recommendations": [
-    "Continue maintaining your healthy lifestyle.",
-    "Regular exercise and adequate sleep are important for mental wellbeing.",
-    "Stay connected with friends and family for social support.",
-    "Engage in activities you enjoy to maintain a positive mood."
-  ]
-};
+// API URL for backend connection
+const API_URL = 'https://mind-recommend-3.onrender.com';
 
 const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
   const [formData, setFormData] = useState({
@@ -38,6 +33,8 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
 
   const academicOptions = ['Poor', 'Average', 'Good'];
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [showErrorSnackbar, setShowErrorSnackbar] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -49,8 +46,10 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     setLoading(true);
+    setError('');
+    setShowErrorSnackbar(false);
 
     // Validate form data
     const requiredFields = [
@@ -58,29 +57,69 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
       'homesick_level', 'mess_food_rating', 'sports_participation',
       'social_activities', 'study_hours', 'screen_time'
     ];
-    
+
     // Check if any field is empty
     for (const field of requiredFields) {
       if (formData[field] === '') {
-        alert('Please fill in all fields before submitting.');
+        setError('Please fill in all fields before submitting.');
+        setShowErrorSnackbar(true);
         setLoading(false);
         return;
       }
     }
-    
-    // Use mock data instead of API call to ensure it works on all devices
-    // This is a temporary solution until the API issues are fixed
-    
-    // Pass the original form data to the parent component
-    setParentFormData(formData);
-    
-    // Use mock prediction data
-    setResult(mockPredictions);
-    
-    // Hide loading indicator after a short delay to simulate API call
-    setTimeout(() => {
+
+    // Check if online
+    if (!navigator.onLine) {
+      setError('No internet connection. Please check your connection and try again.');
+      setShowErrorSnackbar(true);
       setLoading(false);
-    }, 1000);
+      return;
+    }
+
+    try {
+      // Format data exactly as the backend expects it
+      const formattedData = {
+        sleep_hours: Number(formData.sleep_hours),
+        academic_performance: formData.academic_performance.toLowerCase(), // Lowercase for backend
+        bullied: formData.bullied === 'Yes' ? 1 : 0,
+        has_close_friends: formData.has_close_friends === 'Yes' ? 1 : 0,
+        homesick_level: Number(formData.homesick_level),
+        mess_food_rating: Number(formData.mess_food_rating),
+        sports_participation: formData.sports_participation === 'Yes' ? 1 : 0,
+        social_activities: Number(formData.social_activities),
+        study_hours: Number(formData.study_hours),
+        screen_time: Number(formData.screen_time)
+      };
+
+      console.log('Sending data to API:', formattedData);
+
+      // Make API call
+      const response = await axios.post(`${API_URL}/api/predict`, formattedData, {
+        timeout: 30000, // 30 seconds timeout
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
+
+      // Pass the original form data to the parent component
+      setParentFormData(formData);
+      setResult(response.data);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+
+      if (error.message === 'Network Error') {
+        setError('Network error. Please check your internet connection and try again.');
+      } else if (error.response && error.response.status === 400) {
+        setError('Invalid input data. Please check your entries and try again.');
+      } else {
+        setError('An error occurred. Please try again later.');
+      }
+
+      setShowErrorSnackbar(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -302,6 +341,22 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
           />
         </Grid>
       </Grid>
+
+      <Snackbar
+        open={showErrorSnackbar}
+        autoHideDuration={6000}
+        onClose={() => setShowErrorSnackbar(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setShowErrorSnackbar(false)}
+          severity="error"
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {error}
+        </Alert>
+      </Snackbar>
 
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: { xs: 3, sm: 4 } }}>
         <Button
