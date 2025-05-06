@@ -241,10 +241,11 @@ const WelcomePage = ({ onGetStarted }) => {
                   fontSize: { xs: '0.9rem', sm: '1rem' }
                 }}
               >
-                Our research utilized a comprehensive student mental health dataset collected from various educational institutions.
-                The dataset includes information about students' daily habits, academic performance, social interactions, and mental
-                wellbeing indicators. We carefully curated and preprocessed this data to train our machine learning models for
-                accurate mental health recommendations.
+                Our research utilized a comprehensive boarding school mental health dataset with 2,500 student records.
+                The dataset includes key information about students' sleep patterns, academic performance, social interactions,
+                and various lifestyle factors that impact mental wellbeing. We carefully preprocessed this data, including
+                encoding categorical variables and converting boolean features, to train our machine learning models for
+                accurate mental health condition prediction and personalized recommendations.
               </Typography>
 
               <Grid container spacing={2} sx={{ mt: 1 }} className="welcome-stats-grid">
@@ -261,7 +262,7 @@ const WelcomePage = ({ onGetStarted }) => {
                       Total Records
                     </Typography>
                     <Typography variant="h6" sx={{ color: 'white' }}>
-                      1,200+
+                      2,500
                     </Typography>
                   </Box>
                 </Grid>
@@ -278,7 +279,7 @@ const WelcomePage = ({ onGetStarted }) => {
                       Features
                     </Typography>
                     <Typography variant="h6" sx={{ color: 'white' }}>
-                      10+
+                      10
                     </Typography>
                   </Box>
                 </Grid>
@@ -292,10 +293,10 @@ const WelcomePage = ({ onGetStarted }) => {
                     border: '1px solid rgba(100, 255, 218, 0.2)',
                   }}>
                     <Typography variant="subtitle2" sx={{ color: 'rgba(100, 255, 218, 0.9)', mb: 0.5 }}>
-                      Accuracy
+                      Conditions
                     </Typography>
                     <Typography variant="h6" sx={{ color: 'white' }}>
-                      85%+
+                      10
                     </Typography>
                   </Box>
                 </Grid>
@@ -357,9 +358,9 @@ const WelcomePage = ({ onGetStarted }) => {
                   fontSize: { xs: '0.9rem', sm: '1rem' }
                 }}
               >
-                Our mental health recommendation system uses a sophisticated machine learning pipeline with multiple models to analyze student data
-                and provide personalized recommendations. We implemented and compared several algorithms to find the optimal approach for mental
-                health prediction.
+                Our mental health recommendation system uses a Random Forest Classifier model to analyze student data
+                and provide personalized recommendations. The model was trained on our boarding school mental health dataset
+                and can predict 10 different mental health conditions based on student lifestyle and behavioral factors.
               </Typography>
 
               <Box sx={{ pl: 2 }}>
@@ -387,7 +388,7 @@ const WelcomePage = ({ onGetStarted }) => {
                       boxShadow: '0 0 5px rgba(100, 255, 218, 0.5)'
                     }}
                   />
-                  Random Forest Classifier for robust prediction with feature importance analysis
+                  Random Forest Classifier with 100 estimators for robust prediction and feature importance analysis
                 </Typography>
 
                 <Typography
@@ -414,7 +415,7 @@ const WelcomePage = ({ onGetStarted }) => {
                       boxShadow: '0 0 5px rgba(100, 255, 218, 0.5)'
                     }}
                   />
-                  Gradient Boosting for improved accuracy and handling of complex relationships
+                  Trained on 10 key features: sleep hours, academic performance, bullying status, close friendships, homesickness, food satisfaction, sports participation, social activities, study hours, and screen time
                 </Typography>
 
                 <Typography
@@ -441,7 +442,7 @@ const WelcomePage = ({ onGetStarted }) => {
                       boxShadow: '0 0 5px rgba(100, 255, 218, 0.5)'
                     }}
                   />
-                  Neural Network models with optimized hyperparameters for deep pattern recognition
+                  Predicts 10 mental health conditions including Depression, Anxiety, Stress, ADD, PTSD, OCD, Bipolar Disorder, Eating Disorder, Adjustment Disorder, and Normal
                 </Typography>
 
                 <Typography
@@ -467,7 +468,7 @@ const WelcomePage = ({ onGetStarted }) => {
                       boxShadow: '0 0 5px rgba(100, 255, 218, 0.5)'
                     }}
                   />
-                  Ensemble methods combining multiple models for more reliable recommendations
+                  Provides tailored recommendations based on the predicted mental health condition to support student wellbeing
                 </Typography>
               </Box>
             </Box>
