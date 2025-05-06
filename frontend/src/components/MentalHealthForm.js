@@ -13,7 +13,8 @@ import {
 import axios from 'axios';
 
 // Use environment variable for API URL with fallback to localhost for development
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API_URL = process.env.REACT_APP_API_URL || 'https://mind-recommend-3.onrender.com';
+
 
 const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
   const [formData, setFormData] = useState({
