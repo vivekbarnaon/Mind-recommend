@@ -81,9 +81,10 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
 
     try {
       // Format data exactly as the backend expects it
+      // Make sure all fields are in the format expected by the backend
       const formattedData = {
         sleep_hours: Number(formData.sleep_hours),
-        academic_performance: formData.academic_performance,
+        academic_performance: String(formData.academic_performance).toLowerCase(), // Ensure it's a lowercase string
         bullied: formData.bullied === 'Yes' ? 1 : 0,
         has_close_friends: formData.has_close_friends === 'Yes' ? 1 : 0,
         homesick_level: Number(formData.homesick_level),
@@ -116,8 +117,18 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
         setError('Network error. Please check your internet connection and try again.');
       } else if (error.response) {
         if (error.response.status === 400) {
-          setError('Invalid input data format. Please make sure all fields are filled correctly.');
-          console.log('API 400 error details:', error.response.data);
+          // Show the actual error message from the backend if available
+          if (error.response.data && error.response.data.error) {
+            console.log('API 400 error details:', error.response.data);
+            // Create a more user-friendly message
+            if (error.response.data.error.includes("'int' object has no attribute 'lower'")) {
+              setError('There was an issue with the academic performance field. Please try again.');
+            } else {
+              setError(`Data format error: ${error.response.data.error}`);
+            }
+          } else {
+            setError('Invalid input data format. Please make sure all fields are filled correctly.');
+          }
         } else if (error.response.status === 500) {
           setError('Server error. Our team has been notified and is working on it.');
         } else {
