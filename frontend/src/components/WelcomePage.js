@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Button, Container, Grid, Divider, Link } from '@mui/material';
+import { Box, Typography, Button, Container, Grid, Link } from '@mui/material';
 import { motion } from 'framer-motion';
 import PsychologyIcon from '@mui/icons-material/Psychology';
 import DatasetIcon from '@mui/icons-material/Dataset';
