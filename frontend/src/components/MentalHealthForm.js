@@ -96,13 +96,52 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${API_URL}/api/predict`, formData);
-      // Pass the form data to the parent component
+      // Convert string Yes/No values to boolean for API compatibility
+      const formattedData = {
+        ...formData,
+        // Convert Yes/No strings to boolean values
+        bullied: formData.bullied === 'Yes',
+        has_close_friends: formData.has_close_friends === 'Yes',
+        sports_participation: formData.sports_participation === 'Yes',
+        // Ensure numeric fields are numbers
+        sleep_hours: Number(formData.sleep_hours),
+        homesick_level: Number(formData.homesick_level),
+        mess_food_rating: Number(formData.mess_food_rating),
+        social_activities: Number(formData.social_activities),
+        study_hours: Number(formData.study_hours),
+        screen_time: Number(formData.screen_time)
+      };
+
+      console.log('Sending data to API:', formattedData);
+
+      const response = await axios.post(`${API_URL}/api/predict`, formattedData);
+
+      // Pass the original form data to the parent component
       setParentFormData(formData);
       setResult(response.data);
     } catch (error) {
       console.error('Error submitting form:', error);
-      setError(error.response?.data?.error || 'An error occurred. Please try again.');
+
+      // More detailed error handling
+      if (error.message === 'Network Error') {
+        setError('Network error. Please check your internet connection and try again.');
+      } else if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        if (error.response.status === 400) {
+          setError('Invalid data format. Please check your inputs and try again.');
+        } else if (error.response.status === 500) {
+          setError('Server error. Our team has been notified and is working on it.');
+        } else {
+          setError(error.response.data?.error || `Error (${error.response.status}): Please try again.`);
+        }
+      } else if (error.request) {
+        // The request was made but no response was received
+        setError('No response from server. Please try again later.');
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        setError('An unexpected error occurred. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -527,9 +566,29 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
       </Grid>
 
       {error && (
-        <Typography color="error" sx={{ mt: 2, textAlign: 'center' }}>
-          {error}
-        </Typography>
+        <Box
+          sx={{
+            mt: 2,
+            p: 2,
+            borderRadius: '8px',
+            backgroundColor: 'rgba(211, 47, 47, 0.1)',
+            border: '1px solid rgba(211, 47, 47, 0.3)',
+            maxWidth: '100%',
+            mx: 'auto'
+          }}
+        >
+          <Typography
+            color="error"
+            sx={{
+              textAlign: 'center',
+              fontSize: { xs: '0.875rem', sm: '1rem' },
+              fontWeight: 500,
+              wordBreak: 'break-word'
+            }}
+          >
+            {error}
+          </Typography>
+        </Box>
       )}
 
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: { xs: 3, sm: 4 } }}>
