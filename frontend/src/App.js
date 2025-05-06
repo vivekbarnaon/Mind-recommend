@@ -4,6 +4,7 @@ import Particles from "react-tsparticles";
 import { loadSlim } from "tsparticles-slim";
 import MentalHealthForm from './components/MentalHealthForm';
 import ResultDisplay from './components/ResultDisplay';
+import WelcomePage from './components/WelcomePage';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import MobileFooter from './components/MobileFooter';
@@ -15,6 +16,7 @@ function App() {
   const [result, setResult] = useState(null);
   const [formData, setFormData] = useState(null);
   const [showTour, setShowTour] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(true);
 
   const particlesInit = useCallback(async (engine) => {
     await loadSlim(engine);
@@ -31,6 +33,10 @@ function App() {
 
   const handleInfoClick = () => {
     setShowTour(true);
+  };
+
+  const handleGetStarted = () => {
+    setShowWelcome(false);
   };
 
   return (
@@ -157,28 +163,32 @@ function App() {
           />
         </div>
 
-        {/* Header */}
-        <Header onInfoClick={handleInfoClick} />
+        {/* Header - Only show when welcome page is not visible */}
+        {!showWelcome && <Header onInfoClick={handleInfoClick} />}
 
         {/* Tour Guide */}
         <TourGuide open={showTour} onClose={() => setShowTour(false)} />
 
         {/* Main Content */}
-        <Container maxWidth="md" className="content-container">
-          <Box className="glass-panel">
-            {!result ? (
-              <MentalHealthForm setResult={setResult} setFormData={setFormData} />
-            ) : (
-              <ResultDisplay result={result} formData={formData} onReset={handleReset} />
-            )}
-          </Box>
-        </Container>
+        {showWelcome ? (
+          <WelcomePage onGetStarted={handleGetStarted} />
+        ) : (
+          <Container maxWidth="md" className="content-container">
+            <Box className="glass-panel">
+              {!result ? (
+                <MentalHealthForm setResult={setResult} setFormData={setFormData} />
+              ) : (
+                <ResultDisplay result={result} formData={formData} onReset={handleReset} />
+              )}
+            </Box>
+          </Container>
+        )}
 
-        {/* Regular Footer (hidden on mobile) */}
-        <Footer />
+        {/* Regular Footer (hidden on mobile) - Only show when welcome page is not visible */}
+        {!showWelcome && <Footer />}
 
-        {/* Mobile Footer (only visible on mobile) */}
-        <MobileFooter />
+        {/* Mobile Footer (only visible on mobile) - Only show when welcome page is not visible */}
+        {!showWelcome && <MobileFooter />}
       </div>
     </ThemeProvider>
   );
