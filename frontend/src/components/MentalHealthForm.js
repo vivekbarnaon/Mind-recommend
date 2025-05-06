@@ -77,18 +77,19 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
     }
 
     try {
-      // Format data exactly as the backend expects it
+      // Format data exactly as the backend expects it - using numeric values for all fields
       const formattedData = {
-        sleep_hours: Number(formData.sleep_hours),
-        academic_performance: formData.academic_performance.toLowerCase(), // Lowercase for backend
+        sleep_hours: parseInt(formData.sleep_hours),
+        academic_performance: formData.academic_performance === 'Poor' ? 0 :
+                             formData.academic_performance === 'Average' ? 1 : 2,
         bullied: formData.bullied === 'Yes' ? 1 : 0,
         has_close_friends: formData.has_close_friends === 'Yes' ? 1 : 0,
-        homesick_level: Number(formData.homesick_level),
-        mess_food_rating: Number(formData.mess_food_rating),
+        homesick_level: parseInt(formData.homesick_level),
+        mess_food_rating: parseInt(formData.mess_food_rating),
         sports_participation: formData.sports_participation === 'Yes' ? 1 : 0,
-        social_activities: Number(formData.social_activities),
-        study_hours: Number(formData.study_hours),
-        screen_time: Number(formData.screen_time)
+        social_activities: parseInt(formData.social_activities),
+        study_hours: parseInt(formData.study_hours),
+        screen_time: parseInt(formData.screen_time)
       };
 
       console.log('Sending data to API:', formattedData);
@@ -111,7 +112,13 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
       if (error.message === 'Network Error') {
         setError('Network error. Please check your internet connection and try again.');
       } else if (error.response && error.response.status === 400) {
-        setError('Invalid input data. Please check your entries and try again.');
+        // Show more detailed error for debugging
+        if (error.response.data && error.response.data.error) {
+          console.log('API error details:', error.response.data);
+          setError(`API error: ${error.response.data.error}`);
+        } else {
+          setError('Invalid input data. Please check your entries and try again.');
+        }
       } else {
         setError('An error occurred. Please try again later.');
       }
