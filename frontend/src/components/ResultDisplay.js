@@ -53,7 +53,11 @@ const ResultDisplay = ({ result, formData, onReset }) => {
 
   if (!result) return null;
 
-  const recommendationPoints = splitRecommendation(result.recommendation);
+  // Handle both formats: string recommendation or array of recommendations
+  const recommendationPoints = Array.isArray(result.recommendations)
+    ? result.recommendations
+    : (result.recommendation ? splitRecommendation(result.recommendation) : ["Continue maintaining your healthy lifestyle."]);
+
   const conditionInfo = conditionData[result.condition] || {
     severity: 5,
     color: '#4bc0c0',
