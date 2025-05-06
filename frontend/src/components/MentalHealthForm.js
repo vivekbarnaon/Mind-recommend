@@ -54,6 +54,23 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
     setError('');
     setShowErrorSnackbar(false);
 
+    // Validate form data
+    const requiredFields = [
+      'sleep_hours', 'academic_performance', 'bullied', 'has_close_friends',
+      'homesick_level', 'mess_food_rating', 'sports_participation',
+      'social_activities', 'study_hours', 'screen_time'
+    ];
+
+    // Check if any field is empty
+    for (const field of requiredFields) {
+      if (formData[field] === '') {
+        setError(`Please fill in all fields before submitting.`);
+        setShowErrorSnackbar(true);
+        setLoading(false);
+        return;
+      }
+    }
+
     // Check if online
     if (!navigator.onLine) {
       setError('No internet connection. Please check your connection and try again.');
@@ -63,21 +80,21 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
     }
 
     try {
-      // Convert string Yes/No values to boolean for API compatibility
+      // Format data exactly as the backend expects it
       const formattedData = {
-        ...formData,
-        // Convert Yes/No strings to boolean values
-        bullied: formData.bullied === 'Yes',
-        has_close_friends: formData.has_close_friends === 'Yes',
-        sports_participation: formData.sports_participation === 'Yes',
-        // Ensure numeric fields are numbers
         sleep_hours: Number(formData.sleep_hours),
+        academic_performance: formData.academic_performance,
+        bullied: formData.bullied === 'Yes' ? 1 : 0,
+        has_close_friends: formData.has_close_friends === 'Yes' ? 1 : 0,
         homesick_level: Number(formData.homesick_level),
         mess_food_rating: Number(formData.mess_food_rating),
+        sports_participation: formData.sports_participation === 'Yes' ? 1 : 0,
         social_activities: Number(formData.social_activities),
         study_hours: Number(formData.study_hours),
         screen_time: Number(formData.screen_time)
       };
+
+      console.log('Formatted data for API:', formattedData);
 
       // Make API call
       const response = await axios.post(`${API_URL}/api/predict`, formattedData, {
@@ -98,7 +115,14 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
       if (error.message === 'Network Error') {
         setError('Network error. Please check your internet connection and try again.');
       } else if (error.response) {
-        setError(`Server error (${error.response.status}). Please try again later.`);
+        if (error.response.status === 400) {
+          setError('Invalid input data format. Please make sure all fields are filled correctly.');
+          console.log('API 400 error details:', error.response.data);
+        } else if (error.response.status === 500) {
+          setError('Server error. Our team has been notified and is working on it.');
+        } else {
+          setError(`Server error (${error.response.status}). Please try again later.`);
+        }
       } else {
         setError('An error occurred. Please try again later.');
       }
