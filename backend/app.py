@@ -3,15 +3,21 @@ from flask_cors import CORS
 import os
 
 app = Flask(__name__)
-# Enable CORS for all routes
-CORS(app, resources={r"/*": {"origins": "*"}})
+
+# Get frontend URL from environment variable or use default
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'https://mind-recommend.vercel.app')
+
+# Enable CORS for specific origins
+CORS(app, resources={r"/*": {"origins": [FRONTEND_URL, "http://localhost:3000"]}}, supports_credentials=True)
 
 # Add CORS headers to all responses
 @app.after_request
 def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', '*')
+    # Allow requests from the frontend URL and localhost for development
+    response.headers.add('Access-Control-Allow-Origin', request.headers.get('Origin', '*'))
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
     return response
 # Define academic performance options
 academic_options = ['Poor', 'Average', 'Good']
@@ -43,39 +49,48 @@ def predict():
         return jsonify({}), 200
     try:
         data = request.json
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
 
-        # Extract features from request
-        sleep_hours = int(data['sleep_hours'])
-        academic_performance = data['academic_performance']
-        bullied = data['bullied'].lower() == "yes"
-        has_close_friends = data['has_close_friends'].lower() == "yes"
-        homesick_level = int(data['homesick_level'])
-        mess_food_rating = int(data['mess_food_rating'])
-        sports_participation = data['sports_participation'].lower() == "yes"
-        social_activities = int(data['social_activities'])
-        study_hours = int(data['study_hours'])
-        screen_time = int(data['screen_time'])
+        # Log received data for debugging
+        print("Received data:", data)
+
+        # Extract features from request with better error handling
+        try:
+            sleep_hours = int(data.get('sleep_hours', 0))
+            academic_performance = int(data.get('academic_performance', 0))
+            bullied = int(data.get('bullied', 0)) == 1
+            has_close_friends = int(data.get('has_close_friends', 0)) == 1
+            homesick_level = int(data.get('homesick_level', 0))
+            mess_food_rating = int(data.get('mess_food_rating', 0))
+            sports_participation = int(data.get('sports_participation', 0)) == 1
+            social_activities = int(data.get('social_activities', 0))
+            study_hours = int(data.get('study_hours', 0))
+            screen_time = int(data.get('screen_time', 0))
+        except (ValueError, TypeError) as e:
+            return jsonify({'error': f'Invalid data format: {str(e)}'}), 400
 
         # Simple rule-based prediction (similar to the original logic in hello.ipynb)
         # This is a simplified version of the model
+        # academic_performance: 0 = Poor, 1 = Average, 2 = Good
 
         # Depression indicators
-        if (sleep_hours <= 5 and screen_time >= 7) or (bullied and not has_close_friends) or (academic_performance == 'Poor' and social_activities <= 2):
+        if (sleep_hours <= 5 and screen_time >= 7) or (bullied and not has_close_friends) or (academic_performance == 0 and social_activities <= 2):
             condition = 'Depression'
         # Anxiety indicators
-        elif (homesick_level >= 4 and bullied) or (academic_performance == 'Poor' and sleep_hours <= 6) or (screen_time >= 8 and social_activities <= 2):
+        elif (homesick_level >= 4 and bullied) or (academic_performance == 0 and sleep_hours <= 6) or (screen_time >= 8 and social_activities <= 2):
             condition = 'Anxiety'
         # Stress indicators
-        elif (study_hours >= 7) or (sleep_hours <= 5 and academic_performance == 'Poor') or (homesick_level >= 4 and study_hours >= 6):
+        elif (study_hours >= 7) or (sleep_hours <= 5 and academic_performance == 0) or (homesick_level >= 4 and study_hours >= 6):
             condition = 'Stress'
         # ADHD indicators
-        elif (study_hours <= 2 and screen_time >= 8 and academic_performance == 'Poor') or (social_activities >= 4 and academic_performance == 'Poor'):
+        elif (study_hours <= 2 and screen_time >= 8 and academic_performance == 0) or (social_activities >= 4 and academic_performance == 0):
             condition = 'ADHD'
         # PTSD indicators
         elif bullied and sleep_hours <= 5 and homesick_level >= 4:
             condition = 'PTSD'
         # OCD indicators
-        elif (study_hours >= 7 and social_activities <= 1) or (academic_performance == 'Good' and mess_food_rating <= 2 and study_hours >= 6):
+        elif (study_hours >= 7 and social_activities <= 1) or (academic_performance == 2 and mess_food_rating <= 2 and study_hours >= 6):
             condition = 'OCD'
         # Bipolar Disorder indicators
         elif (sleep_hours <= 4 or sleep_hours >= 9) and (social_activities >= 4 or sports_participation) and screen_time >= 8:
@@ -84,7 +99,7 @@ def predict():
         elif mess_food_rating <= 2 and sleep_hours <= 5 and homesick_level >= 4:
             condition = 'Eating Disorder'
         # Adjustment Disorder indicators
-        elif homesick_level >= 4 and academic_performance == 'Average' and 5 <= sleep_hours <= 7:
+        elif homesick_level >= 4 and academic_performance == 1 and 5 <= sleep_hours <= 7:
             condition = 'Adjustment Disorder'
         # Normal
         else:
@@ -97,7 +112,14 @@ def predict():
         })
 
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"Error in predict endpoint: {str(e)}")
+        print(f"Error details: {error_details}")
+        return jsonify({
+            'error': str(e),
+            'message': 'An error occurred while processing your request. Please check your input data and try again.'
+        }), 400
 
 @app.route('/api/academic-options', methods=['GET', 'OPTIONS'])
 def get_academic_options():

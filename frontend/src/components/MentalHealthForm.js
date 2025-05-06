@@ -17,6 +17,9 @@ import axios from 'axios';
 // API URL for backend connection
 const API_URL = 'https://mind-recommend-3.onrender.com';
 
+// Backup API URL in case the primary one fails
+const BACKUP_API_URL = 'https://mind-recommend-api.onrender.com';
+
 const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
   const [formData, setFormData] = useState({
     sleep_hours: '',
@@ -80,13 +83,13 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
       // Format data exactly as the backend expects it - using numeric values for all fields
       const formattedData = {
         sleep_hours: parseInt(formData.sleep_hours),
-        academic_performance: formData.academic_performance === 'Poor' ? 0 :
-                             formData.academic_performance === 'Average' ? 1 : 2,
-        bullied: formData.bullied === 'Yes' ? 1 : 0,
-        has_close_friends: formData.has_close_friends === 'Yes' ? 1 : 0,
+        academic_performance: parseInt(formData.academic_performance === 'Poor' ? 0 :
+                             formData.academic_performance === 'Average' ? 1 : 2),
+        bullied: parseInt(formData.bullied === 'Yes' ? 1 : 0),
+        has_close_friends: parseInt(formData.has_close_friends === 'Yes' ? 1 : 0),
         homesick_level: parseInt(formData.homesick_level),
         mess_food_rating: parseInt(formData.mess_food_rating),
-        sports_participation: formData.sports_participation === 'Yes' ? 1 : 0,
+        sports_participation: parseInt(formData.sports_participation === 'Yes' ? 1 : 0),
         social_activities: parseInt(formData.social_activities),
         study_hours: parseInt(formData.study_hours),
         screen_time: parseInt(formData.screen_time)
@@ -94,18 +97,38 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
 
       console.log('Sending data to API:', formattedData);
 
-      // Make API call
-      const response = await axios.post(`${API_URL}/api/predict`, formattedData, {
-        timeout: 30000, // 30 seconds timeout
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      });
+      // Try primary API URL first
+      try {
+        const response = await axios.post(`${API_URL}/api/predict`, formattedData, {
+          timeout: 30000, // 30 seconds timeout
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          withCredentials: false // Explicitly disable sending credentials
+        });
 
-      // Pass the original form data to the parent component
-      setParentFormData(formData);
-      setResult(response.data);
+        // Pass the original form data to the parent component
+        setParentFormData(formData);
+        setResult(response.data);
+        return; // Exit if successful
+      } catch (primaryError) {
+        console.error('Error with primary API, trying backup:', primaryError);
+
+        // If primary API fails, try backup API
+        const response = await axios.post(`${BACKUP_API_URL}/api/predict`, formattedData, {
+          timeout: 30000, // 30 seconds timeout
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          withCredentials: false // Explicitly disable sending credentials
+        });
+
+        // Pass the original form data to the parent component
+        setParentFormData(formData);
+        setResult(response.data);
+      }
     } catch (error) {
       console.error('Error submitting form:', error);
 
@@ -119,8 +142,10 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
         } else {
           setError('Invalid input data. Please check your entries and try again.');
         }
+      } else if (error.code === 'ECONNABORTED') {
+        setError('Request timed out. The server might be overloaded, please try again later.');
       } else {
-        setError('An error occurred. Please try again later.');
+        setError(`An error occurred: ${error.message}. Please try again later.`);
       }
 
       setShowErrorSnackbar(true);
