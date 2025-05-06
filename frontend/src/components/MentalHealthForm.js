@@ -8,10 +8,14 @@ import {
   MenuItem,
   Typography,
   Grid,
-  CircularProgress
+  CircularProgress,
+  Alert,
+  Snackbar
 } from '@mui/material';
+import axios from 'axios';
 
-// Use hardcoded responses to ensure the app works on all devices
+// API URL for backend connection
+const API_URL = 'https://mind-recommend-3.onrender.com';
 
 
 const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
@@ -30,6 +34,8 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
 
   const academicOptions = ['Poor', 'Average', 'Good'];
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [showErrorSnackbar, setShowErrorSnackbar] = useState(false);
 
   // No API calls on component mount to prevent errors
 
@@ -45,25 +51,62 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
     e.preventDefault();
 
     setLoading(true);
+    setError('');
+    setShowErrorSnackbar(false);
 
-    // Use mock data instead of API call to ensure it works on all devices
-    setTimeout(() => {
-      // Pass the original form data to the parent component
-      setParentFormData(formData);
+    // Check if online
+    if (!navigator.onLine) {
+      setError('No internet connection. Please check your connection and try again.');
+      setShowErrorSnackbar(true);
+      setLoading(false);
+      return;
+    }
 
-      // Use mock response data
-      setResult({
-        "condition": "Normal",
-        "recommendations": [
-          "Continue maintaining your healthy lifestyle.",
-          "Regular exercise and adequate sleep are important for mental wellbeing.",
-          "Stay connected with friends and family for social support."
-        ]
+    try {
+      // Convert string Yes/No values to boolean for API compatibility
+      const formattedData = {
+        ...formData,
+        // Convert Yes/No strings to boolean values
+        bullied: formData.bullied === 'Yes',
+        has_close_friends: formData.has_close_friends === 'Yes',
+        sports_participation: formData.sports_participation === 'Yes',
+        // Ensure numeric fields are numbers
+        sleep_hours: Number(formData.sleep_hours),
+        homesick_level: Number(formData.homesick_level),
+        mess_food_rating: Number(formData.mess_food_rating),
+        social_activities: Number(formData.social_activities),
+        study_hours: Number(formData.study_hours),
+        screen_time: Number(formData.screen_time)
+      };
+
+      // Make API call
+      const response = await axios.post(`${API_URL}/api/predict`, formattedData, {
+        timeout: 30000, // 30 seconds timeout
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
       });
 
-      // Hide loading indicator
+      // Pass the original form data to the parent component
+      setParentFormData(formData);
+      setResult(response.data);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+
+      // Set appropriate error message
+      if (error.message === 'Network Error') {
+        setError('Network error. Please check your internet connection and try again.');
+      } else if (error.response) {
+        setError(`Server error (${error.response.status}). Please try again later.`);
+      } else {
+        setError('An error occurred. Please try again later.');
+      }
+
+      setShowErrorSnackbar(true);
+    } finally {
       setLoading(false);
-    }, 1500); // Simulate API call with 1.5 second delay
+    }
   };
 
   return (
@@ -484,7 +527,21 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
         </Grid>
       </Grid>
 
-      {/* Error message removed to prevent issues */}
+      <Snackbar
+        open={showErrorSnackbar}
+        autoHideDuration={6000}
+        onClose={() => setShowErrorSnackbar(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setShowErrorSnackbar(false)}
+          severity="error"
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {error}
+        </Alert>
+      </Snackbar>
 
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: { xs: 3, sm: 4 } }}>
         <Button
