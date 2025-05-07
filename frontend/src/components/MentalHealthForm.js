@@ -17,8 +17,8 @@ import axios from 'axios';
 // API URL for backend connection
 const API_URL = 'https://mind-recommend-1.onrender.com';
 
-// Backup API URL in case the primary one fails
-const BACKUP_API_URL = 'https://mind-recommend-api.onrender.com';
+// Backup API URL in case the primary one fails - using the same URL with a different timeout
+const BACKUP_API_URL = 'https://mind-recommend-1.onrender.com';
 
 const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
   const [formData, setFormData] = useState({
@@ -36,6 +36,7 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
 
   const academicOptions = ['Poor', 'Average', 'Good'];
   const [loading, setLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState('Processing your request...');
   const [error, setError] = useState('');
   const [showErrorSnackbar, setShowErrorSnackbar] = useState(false);
 
@@ -51,6 +52,7 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
     e.preventDefault();
 
     setLoading(true);
+    setLoadingMessage('Processing your request...');
     setError('');
     setShowErrorSnackbar(false);
 
@@ -99,8 +101,9 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
 
       // Try primary API URL first
       try {
+        setLoadingMessage('Connecting to primary API...');
         const response = await axios.post(`${API_URL}/api/predict`, formattedData, {
-          timeout: 30000, // 30 seconds timeout
+          timeout: 60000, // 60 seconds timeout
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
@@ -116,8 +119,9 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
         console.error('Error with primary API, trying backup:', primaryError);
 
         // If primary API fails, try backup API
+        setLoadingMessage('Primary API failed, trying backup...');
         const response = await axios.post(`${BACKUP_API_URL}/api/predict`, formattedData, {
-          timeout: 30000, // 30 seconds timeout
+          timeout: 60000, // 60 seconds timeout
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
@@ -143,7 +147,7 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
       });
 
       if (error.message === 'Network Error') {
-        setError('Network error. Please check your internet connection and try again.');
+        setError('Network error. The server might be starting up. Please wait a moment and try again.');
       } else if (error.response && error.response.status === 400) {
         // Show more detailed error for debugging
         if (error.response.data && error.response.data.error) {
@@ -153,13 +157,13 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
           setError('Invalid input data. Please check your entries and try again.');
         }
       } else if (error.code === 'ECONNABORTED') {
-        setError('Request timed out. The server might be overloaded, please try again later.');
+        setError('Request timed out. Free tier servers can take up to 50-60 seconds to wake up. Please try again.');
       } else if (error.response && error.response.status === 0) {
-        setError('CORS error: The server is not allowing cross-origin requests. Please check your backend configuration.');
+        setError('CORS error: The server is not allowing cross-origin requests. Please try again later.');
       } else if (error.response && error.response.status === 500) {
         setError('Server error: The backend server encountered an internal error. Please try again later.');
       } else {
-        setError(`An error occurred: ${error.message}. Please try again later.`);
+        setError(`An error occurred: ${error.message}. Please try again in a few moments.`);
       }
 
       setShowErrorSnackbar(true);
@@ -422,7 +426,10 @@ const MentalHealthForm = ({ setResult, setFormData: setParentFormData }) => {
           }}
         >
           {loading ? (
-            <CircularProgress size={24} sx={{ color: '#1a1a2e' }} />
+            <>
+              <CircularProgress size={24} sx={{ color: '#1a1a2e', mr: 1 }} />
+              {loadingMessage}
+            </>
           ) : (
             'Predict Mental Health'
           )}
